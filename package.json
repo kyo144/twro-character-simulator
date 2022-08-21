@@ -9,23 +9,28 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/cache": "^11.10.1",
     "@emotion/react": "^11.10.0",
+    "@emotion/server": "^11.10.0",
     "@emotion/styled": "^11.10.0",
     "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.10.1",
-    "@mui/styled-engine-sc": "^5.10.1",
     "next": "12.2.5",
+    "next-auth": "^4.10.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "styled-components": "^5.3.5"
   },
   "devDependencies": {
+    "@emotion/eslint-plugin": "^11.10.0",
     "@types/node": "18.7.8",
     "@types/react": "18.0.17",
     "@types/react-dom": "18.0.6",
     "@types/styled-components": "^5.1.26",
     "eslint": "8.22.0",
     "eslint-config-next": "12.2.5",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.7.1",
     "typescript": "4.7.4"
   }
 }
