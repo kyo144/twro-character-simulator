@@ -1,22 +1,80 @@
 import { useState, useEffect, useRef } from 'react';
 import type { NextPage } from 'next';
 import Script from 'next/script';
-import StyledButton from '../components/StyledButton';
-import { Button } from '@mui/material';
-import StyledEmotionButton from '../components/StyledEmotionButton';
+import { Typography, Button, Chip, CircularProgress } from '@mui/material';
+import Box from '@mui/material/Box';
 
 const SsrPage: NextPage<{ name: string }> = ({ name }) => {
-  console.log('yoo');
+  const refSearchBox = useRef<HTMLDivElement | null>(null);
+  const refSearchResults = useRef<HTMLDivElement | null>(null);
+
+  const [isSearchStarting, setIsSearchStarting] = useState<Boolean>(false);
+  const [isResultsReady, setIsResultsReady] = useState<Boolean>(false);
+
+  useEffect(() => {
+    // @ts-ignore
+    if (window.google) {
+      // @ts-ignore
+      google?.search?.cse?.element?.render(
+        {
+          div: refSearchBox.current,
+          tag: 'searchbox',
+        },
+        {
+          div: refSearchResults.current,
+          tag: 'searchresults',
+        }
+      );
+    }
+    // @ts-ignore
+    if (window.__gcse) {
+      // @ts-ignore
+      window.__gcse.searchCallbacks = {
+        web: {
+          starting: () => {
+            console.log('start searching');
+            setIsSearchStarting(true);
+            setIsResultsReady(false);
+          },
+          ready: () => {
+            console.log('results ready');
+            setIsSearchStarting(false);
+            setIsResultsReady(true);
+          },
+        },
+      };
+    }
+    return () => {};
+  }, []);
+
   return (
     <>
-      <Script async src={`https://cse.google.com/cse.js?cx=${process.env.NEXT_PUBLIC_CSE_CX}`} />
-      <div>
-        <p>{`YOOOOOOOO! ${name}：Ｄ`}</p>
-        <StyledButton onStyledButtonClick={() => console.log('HEY!')}>Sup</StyledButton>
-        <Button variant="contained">Contained</Button>
-        <StyledEmotionButton backgroundColor="salmon">Emotion</StyledEmotionButton>
-      </div>
-      <div className="gcse-search"></div>
+      <Script
+        src={`https://cse.google.com/cse.js?cx=${process.env.NEXT_PUBLIC_CSE_CX}`}
+        strategy="afterInteractive"
+      />
+      <Script
+        id="gcse-config"
+        dangerouslySetInnerHTML={{
+          __html: `window.__gcse = {}`,
+        }}
+        strategy="afterInteractive"
+      />
+      <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+        <Typography sx={{ flex: '1 1 50%' }} variant="h5">{`YOOOO! ${name}：Ｄ`}</Typography>
+        <Box sx={{ flex: '1 1 50%' }}>
+          <div ref={refSearchBox} className="gcse-searchbox" />
+        </Box>
+      </Box>
+      <Button variant="contained">Contained</Button>
+      <Box sx={{ display: isSearchStarting ? 'flex' : 'none', justifyContent: 'center' }}>
+        <CircularProgress />
+      </Box>
+
+      <Box sx={{ display: isResultsReady ? 'block' : 'none' }}>
+        <div ref={refSearchResults} className="gcse-searchresults" />
+      </Box>
+      <Chip label="Chip Filled" />
     </>
   );
 };
