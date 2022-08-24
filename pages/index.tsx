@@ -1,12 +1,7 @@
-import type { NextPage } from 'next'
-import Link from 'next/link'
+import type { NextPage } from 'next';
 
 const Home: NextPage = () => {
-  return (
-    <div>
-      <Link href={`/ssr-page`}>SsrPage</Link>
-    </div>
-  )
-}
+  return <div>Home Page</div>;
+};
 
-export default Home
+export default Home;
