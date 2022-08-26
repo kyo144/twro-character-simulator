@@ -15,6 +15,7 @@ const theme = createTheme({
       styleOverrides: {
         a: {
           textDecoration: 'none',
+          display: 'block',
         },
       },
     },
