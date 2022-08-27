@@ -7,7 +7,7 @@ import useSize from '@react-hook/size';
 import { Typography, Button, Chip, CircularProgress } from '@mui/material';
 import Box from '@mui/material/Box';
 
-const SsrPage: NextPage<{ name: string }> = ({ name }) => {
+const SsrPage: NextPage<{ fact: string }> = ({ fact }) => {
   const refSearchBox = useRef<HTMLDivElement | null>(null);
   const refSearchResults = useRef<HTMLDivElement | null>(null);
   const [searchResultsWidth, searchResultsHeight] = useSize(refSearchResults);
@@ -78,11 +78,12 @@ const SsrPage: NextPage<{ name: string }> = ({ name }) => {
   return (
     <>
       <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-        <Typography sx={{ flex: '1 1 50%' }} variant="h5">{`YOOOO! ${name}：Ｄ`}</Typography>
+        <Typography sx={{ flex: '1 1 50%' }} variant="h5">{`YOOOO!：Ｄ`}</Typography>
         <Box sx={{ flex: '1 1 50%' }}>
           <div ref={refSearchBox} className="gcse-searchbox" />
         </Box>
       </Box>
+      <Typography variant="body1" sx={{ mb: 2 }}>{`${fact}`}</Typography>
       <Button variant="contained">Contained</Button>
       <Box sx={{ visibility: isResultsReady ? 'visible' : 'hidden' }}>
         <div ref={refSearchResults} className="gcse-searchresults" />
@@ -100,9 +101,9 @@ const SsrPage: NextPage<{ name: string }> = ({ name }) => {
 };
 
 export async function getStaticProps() {
-  const res = await fetch('http://localhost:3000/api/hello');
+  const res = await fetch('https://catfact.ninja/fact');
   const data = await res.json();
-  return { props: { name: data.name } };
+  return { props: { fact: data.fact } };
 }
 
 export default SsrPage;
