@@ -1,5 +1,4 @@
 import Head from 'next/head';
-import Script from 'next/script';
 import type { AppProps } from 'next/app';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -19,19 +18,6 @@ export default function MyApp(props: MyAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
   return (
     <>
-      <Script
-        src={`https://cse.google.com/cse.js?cx=${process.env.NEXT_PUBLIC_CSE_CX}`}
-        strategy="afterInteractive"
-      />
-      <Script
-        id="gcse-config"
-        dangerouslySetInnerHTML={{
-          __html: `window.__gcse = {
-            parsetags: 'explicit'
-          }`,
-        }}
-        strategy="afterInteractive"
-      />
       <CacheProvider value={emotionCache}>
         <Head>
           <title>TwRO Character Simulator</title>

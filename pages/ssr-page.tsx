@@ -1,13 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
 import type { NextPage } from 'next';
 import Script from 'next/script';
-import Router from 'next/router';
+import { useRouter } from 'next/router';
 import Head from 'next/head';
 import useSize from '@react-hook/size';
-import { Typography, Button, Chip, CircularProgress } from '@mui/material';
+import { Typography, Button, CircularProgress } from '@mui/material';
 import Box from '@mui/material/Box';
 
+const GcseScript = () => {
+  return (
+    <Head>
+      <script src={`https://cse.google.com/cse.js?cx=${process.env.NEXT_PUBLIC_CSE_CX}`} async />
+    </Head>
+  );
+};
+
 const SsrPage: NextPage<{ fact: string }> = ({ fact }) => {
+  const router = useRouter();
+
   const refSearchBox = useRef<HTMLDivElement | null>(null);
   const refSearchResults = useRef<HTMLDivElement | null>(null);
   const [searchResultsWidth, searchResultsHeight] = useSize(refSearchResults);
@@ -15,68 +25,51 @@ const SsrPage: NextPage<{ fact: string }> = ({ fact }) => {
   const [isSearchStarting, setIsSearchStarting] = useState<Boolean>(false);
   const [isResultsReady, setIsResultsReady] = useState<Boolean>(false);
 
-  const renderGcse = () => {
-    // @ts-ignore
-    google?.search?.cse?.element?.render(
-      {
-        div: refSearchBox.current,
-        tag: 'searchbox',
-      },
-      {
-        div: refSearchResults.current,
-        tag: 'searchresults',
-      }
-    );
-    const cseInputField = document.querySelector('input.gsc-input') as HTMLInputElement | null;
-    if (cseInputField) cseInputField.placeholder = 'Start typing to search for articles';
-    const clearButton = document.querySelector('[title="Clear search box"]') as HTMLAnchorElement;
-    clearButton?.addEventListener('click', () => {
-      setIsSearchStarting(false);
-      setIsResultsReady(false);
-    });
-    const searchToolForm = document.querySelector('form.gsc-search-box');
-    // @ts-ignore
-    searchToolForm?.addEventListener('keyup', (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        if (cseInputField?.value === '') return;
-        setIsSearchStarting(true);
-        setIsResultsReady(false);
-      }
-    });
-    const searchButton = document.querySelector(
-      'button.gsc-search-button.gsc-search-button-v2'
-    ) as HTMLButtonElement;
-    searchButton.addEventListener('click', () => {
-      if (cseInputField?.value === '') return;
-      setIsSearchStarting(true);
-      setIsResultsReady(false);
-    });
+  const [gcse, setGcse] = useState<React.ReactNode | null>(null);
+
+  const onRouteChangeComplete = () => {
+    setGcse(null);
+    setGcse(<GcseScript />);
   };
 
   useEffect(() => {
-    let gcseTimer: any = null;
+    setGcse(<GcseScript />);
     // @ts-ignore
-    if (window?.google) {
-      renderGcse();
-    } else {
-      gcseTimer = setTimeout(() => {
-        renderGcse();
-      }, 500);
-    }
-    return () => {
-      clearTimeout(gcseTimer);
+    window.__gcse.initializationCallback = () => {
+      const cseInputField = document.querySelector('input.gsc-input') as HTMLInputElement | null;
+      if (cseInputField) cseInputField.placeholder = 'Start typing to search for articles';
+      const clearButton = document.querySelector('[title="Clear search box"]') as HTMLAnchorElement;
+      clearButton?.addEventListener('click', () => {
+        setIsSearchStarting(false);
+        setIsResultsReady(false);
+      });
     };
-  }, []);
-
-  useEffect(() => {
-    if (isSearchStarting && searchResultsHeight > 40) {
-      setIsSearchStarting(false);
-      setIsResultsReady(true);
-    }
-  }, [isSearchStarting, searchResultsHeight]);
+    // @ts-ignore
+    window.__gcse.searchCallbacks = {
+      web: {
+        starting: () => {
+          setIsSearchStarting(true);
+          setIsResultsReady(false);
+        },
+        ready: () => {
+          setIsSearchStarting(false);
+          setIsResultsReady(true);
+        },
+      },
+    };
+    router.events.on('routeChangeComplete', onRouteChangeComplete);
+  }, [router.events]);
 
   return (
     <>
+      {gcse}
+      <Script
+        id="gcse-config"
+        dangerouslySetInnerHTML={{
+          __html: `window.__gcse = {}`,
+        }}
+        strategy="afterInteractive"
+      />
       <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
         <Typography sx={{ flex: '1 1 50%' }} variant="h5">{`YOOOO!：Ｄ`}</Typography>
         <Box sx={{ flex: '1 1 50%' }}>
