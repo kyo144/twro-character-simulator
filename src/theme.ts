@@ -15,13 +15,12 @@ const theme = createTheme({
   },
   components: {
     MuiCssBaseline: {
-      styleOverrides: {
+      styleOverrides: () => `
         a: {
           textDecoration: 'none',
           display: 'block',
-          color: 'inherit',
-        },
-      },
+        }
+      `,
     },
   },
 });
